@@ -2,7 +2,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from cat.serializers import SpyCatSerializer
-from mission.models import Mission, Target
+from mission.models import (
+    Mission,
+    Target
+)
 from cat.models import SpyCat
 
 

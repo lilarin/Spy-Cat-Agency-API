@@ -77,8 +77,11 @@ target information is appropriately handled throughout the mission lifecycle.
 
 ## API Endpoints
 
+- **[Postman collection with all of the endpoints](https://www.postman.com/material-geoscientist-76643827/spy-cat-agency-api/collection/upfwu0r/spy-cat-agency-api?action=share&creator=38092262)**
+
 - **Swagger documentation with all API endpoints**:
   - `/api/doc/swagger`
+
 ![img.png](https://imgur.com/eT6TObg.png)
 
 ## Environment Variables

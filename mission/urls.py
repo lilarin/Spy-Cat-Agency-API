@@ -1,6 +1,9 @@
 from rest_framework.routers import DefaultRouter
 
-from mission.views import MissionViewSet, TargetViewSet
+from mission.views import (
+    MissionViewSet,
+    TargetViewSet
+)
 
 router = DefaultRouter()
 

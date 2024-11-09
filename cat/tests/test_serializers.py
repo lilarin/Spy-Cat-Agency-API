@@ -1,7 +1,10 @@
 from unittest.mock import patch
 from rest_framework.test import APITestCase
 from cat.models import SpyCat
-from cat.serializers import SpyCatSerializer, SpyCatSalaryUpdateSerializer
+from cat.serializers import (
+    SpyCatSerializer,
+    SpyCatSalaryUpdateSerializer
+)
 
 class SpyCatSerializerTests(APITestCase):
     def setUp(self):

@@ -12,7 +12,10 @@ from rest_framework.mixins import (
 )
 from drf_spectacular.utils import extend_schema
 
-from mission.models import Mission, Target
+from mission.models import (
+    Mission,
+    Target
+)
 from mission.serializers import (
     MissionSerializer,
     TargetSerializer,

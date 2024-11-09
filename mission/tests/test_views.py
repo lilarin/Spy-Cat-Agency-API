@@ -1,7 +1,10 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 from cat.models import SpyCat
-from mission.models import Mission, Target
+from mission.models import (
+    Mission,
+    Target
+)
 
 
 class MissionViewSetTests(APITestCase):
