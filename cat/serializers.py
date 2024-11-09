@@ -11,11 +11,15 @@ class SpyCatSerializer(serializers.ModelSerializer):
             response.raise_for_status()
             breeds_data = response.json()
         except requests.exceptions.RequestException as error:
-            raise serializers.ValidationError(f"Error fetching breed data: {str(error)}")
+            raise serializers.ValidationError(
+                f"Error fetching breed data: {str(error)}"
+            )
         valid_breeds = {breed["name"] for breed in breeds_data}
         for breed in breeds_data:
             if "alt_names" in breed and breed["alt_names"]:
-                alt_names = [name.strip() for name in breed["alt_names"].split(",")]
+                alt_names = [
+                    name.strip() for name in breed["alt_names"].split(",")
+                ]
                 valid_breeds.update(alt_names)
         if value not in valid_breeds:
             raise serializers.ValidationError("Invalid breed name.")
