@@ -79,6 +79,7 @@ target information is appropriately handled throughout the mission lifecycle.
 
 - **Swagger documentation with all API endpoints**:
   - `/api/doc/swagger`
+
 ![img.png](https://imgur.com/eT6TObg.png)
 
 ## Environment Variables
