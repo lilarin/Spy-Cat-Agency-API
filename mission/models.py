@@ -1,5 +1,5 @@
 from django.db import models
-from cats.models import SpyCat
+from cat.models import SpyCat
 
 
 class Mission(models.Model):
