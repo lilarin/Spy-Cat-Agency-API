@@ -55,7 +55,7 @@ class MissionViewSet(
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
-        description="Delete a mission. A mission cannot be deleted if assigned to a cat."
+        description="Delete a mission if not assigned to a cat."
     )
     def destroy(self, request, *args, **kwargs):
         mission = self.get_object()
@@ -76,7 +76,9 @@ class MissionViewSet(
         serializer = MissionSpyCatUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         updated_mission = serializer.update_cat(mission)
-        return Response(MissionSerializer(updated_mission).data, status=status.HTTP_200_OK)
+        return Response(
+            MissionSerializer(updated_mission).data, status=status.HTTP_200_OK
+        )
 
 
 @extend_schema(tags=["Targets"])
@@ -86,6 +88,8 @@ class TargetViewSet(viewsets.GenericViewSet):
     def get_serializer_class(self):
         if self.action == "update_notes":
             return TargetNoteUpdateSerializer
+        elif self.action == "update_status":
+            return TargetSerializer
         return TargetSerializer
 
     @extend_schema(
@@ -120,4 +124,6 @@ class TargetViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         updated_target = serializer.save()
 
-        return Response(TargetSerializer(updated_target).data, status=status.HTTP_200_OK)
+        return Response(
+            TargetSerializer(updated_target).data, status=status.HTTP_200_OK
+        )

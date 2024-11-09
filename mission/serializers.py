@@ -27,6 +27,24 @@ class TargetSerializer(serializers.ModelSerializer):
         return target
 
 
+class TargetNoteUpdateSerializer(serializers.Serializer):
+    notes = serializers.CharField(max_length=100)
+
+    class Meta:
+        fields = ("notes",)
+
+    def update(self, target, validated_data):
+        if target.completed or (target.mission and target.mission.completed):
+            raise ValidationError(
+                "Notes cannot be updated because "
+                "the target or mission is completed."
+            )
+
+        target.notes = validated_data["notes"]
+        target.save()
+        return target
+
+
 class MissionSerializer(serializers.ModelSerializer):
     targets = TargetSerializer(many=True)
     cat = serializers.PrimaryKeyRelatedField(
@@ -50,11 +68,15 @@ class MissionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         cat = validated_data.get("cat")
         if cat and cat.mission and not cat.mission.completed:
-            raise serializers.ValidationError(f"The cat {cat} already has an active mission.")
+            raise serializers.ValidationError(
+                f"The cat {cat} already has an active mission."
+            )
 
         targets_data = validated_data.pop("targets")
         if len(targets_data) < 1 or len(targets_data) > 3:
-            raise serializers.ValidationError("A mission must have between 1 and 3 targets.")
+            raise serializers.ValidationError(
+                "A mission must have between 1 and 3 targets."
+            )
 
         mission = Mission.objects.create(**validated_data)
         for target_data in targets_data:
@@ -72,10 +94,17 @@ class MissionSpyCatUpdateSerializer(serializers.Serializer):
             try:
                 cat = SpyCat.objects.get(id=cat_id)
             except SpyCat.DoesNotExist:
-                raise ValidationError({"detail": "SpyCat with the given id does not exist."})
+                raise ValidationError(
+                    {"detail": "SpyCat with the given id does not exist."}
+                )
 
-            if hasattr(cat, "mission") and cat.mission and not cat.mission.completed:
-                raise ValidationError(f"The cat {cat} already has an active mission.")
+            if (
+                    hasattr(cat, "mission")
+                    and cat.mission and not cat.mission.completed
+            ):
+                raise ValidationError(
+                    f"The cat {cat} already has an active mission."
+                )
 
             mission.cat = cat
         else:
@@ -83,18 +112,3 @@ class MissionSpyCatUpdateSerializer(serializers.Serializer):
 
         mission.save()
         return mission
-
-
-class TargetNoteUpdateSerializer(serializers.Serializer):
-    notes = serializers.CharField(max_length=100)
-
-    class Meta:
-        fields = ("notes",)
-
-    def update(self, target, validated_data):
-        if target.completed or (target.mission and target.mission.completed):
-            raise ValidationError("Notes cannot be updated because the target or mission is completed.")
-
-        target.notes = validated_data["notes"]
-        target.save()
-        return target

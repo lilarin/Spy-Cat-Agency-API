@@ -1,20 +1,18 @@
 from django.core.validators import MaxLengthValidator
-from django.db import models
+from django.db import models, transaction
 from cat.models import SpyCat
 from django.core.exceptions import ValidationError
 
 
 class Mission(models.Model):
-    cat = models.OneToOneField(SpyCat, null=True, blank=True, on_delete=models.CASCADE)
+    cat = models.OneToOneField(
+        SpyCat, null=True, blank=True, on_delete=models.CASCADE
+    )
     completed = models.BooleanField(default=False)
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(completed=False) | models.Q(cat__mission__isnull=True),
-                name="only_one_active_mission_per_cat"
-            )
-        ]
+    def clean(self):
+        if self.cat and self.cat.mission and not self.cat.mission.completed:
+            raise ValidationError("A cat can only have one active mission.")
 
     def __str__(self):
         return f"Mission {self.id}"
@@ -24,8 +22,12 @@ class Target(models.Model):
     mission = models.ForeignKey(
         Mission, related_name="targets", on_delete=models.CASCADE
     )
-    name = models.CharField(max_length=100, validators=[MaxLengthValidator(100)])
-    country = models.CharField(max_length=100, validators=[MaxLengthValidator(100)])
+    name = models.CharField(
+        max_length=100, validators=[MaxLengthValidator(100)]
+    )
+    country = models.CharField(
+        max_length=100, validators=[MaxLengthValidator(100)]
+    )
     notes = models.TextField()
     completed = models.BooleanField(default=False)
 
@@ -34,8 +36,17 @@ class Target(models.Model):
             raise ValidationError("A mission can only have up to 3 targets.")
 
     def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if self.mission:
+                all_completed = all(
+                    target.completed for target in self.mission.targets.all()
+                )
+                if all_completed:
+                    self.mission.completed = True
+                else:
+                    self.mission.completed = False
+                self.mission.save()
 
     def __str__(self):
         return self.name
